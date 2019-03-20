@@ -1,14 +1,75 @@
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Take-A-Hike</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial;
+  font-size: 17px;
+  background-color: black;
+  color: lightblue;
+  padding-left: 10px;
+}
+
+#myVideo {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  bottom: 0;
+  min-width: 100%; 
+  min-height: 100%;
+}
+
+.content {
+  position: relative;
+  top: 300px;
+  background: rgba(0, 0, 0, 0.25);
+  color: lightblue;
+  width: 240px;
+  padding: 1px 5px 10px 5px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  border-radius: 10px;
+}
+
+#myBtn {
+  width: 200px;
+  font-size: 18px;
+  padding: 10px;
+  border: none;
+  background: red;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+#myBtn:hover {
+  background: green;
+  color: black;
+}
+</style>
 </head>
 <body>
 
-    <h1>Hello World!</h1>
-    
-</body>
+<video autoplay muted loop id="myVideo">
+  <source src="mainvideo.mov" type="video/mp4">
+  Your browser does not support HTML5 video.
+</video>
+<h1>Take-A-Hike</h1>
 
-</html>
+<div class="content">
+  <h2>Find a hiking trail</h2>
+  <button id="myBtn" onclick="window.location.href='search.html'">Click to GO!</button>
+</div>
+
+<script>
+var video = document.getElementById("myVideo");
+var btn = document.getElementById("myBtn")
+</script>
