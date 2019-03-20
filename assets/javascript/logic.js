@@ -12,20 +12,31 @@ firebase.initializeApp(config);
 // https://api.mapbox.com/styles/v1/mapbox/outdoors-v9.html?title=true&access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA#16/32.309826/-110.8229
 
 var database = firebase.database();
-var globalLatitude = "";
-var globalLongitude = "";
+var globalLatitude = "32.2217"; // default lat for Tucson, AZ
+var globalLongitude = "-110.9265"; // default lat for Tucson, AZ
 var searchLatitude = "";
 var searchLongitude = "";
 var imagetxt = "";
 var trailId = "";
 
+// Clear dynamic fields
+function clearFields(){
+    $("#name-trail").empty();
+    $("#location-trail").empty();
+    $("#summary-trail").empty();
+    $("#HP-search-display > thead").empty();
+    $("#HP-search-display > tbody").empty();
+    $("#HP-image-display").empty();
+    $("#modal-btn").empty();
+    $("#trail-detail-display > thead").empty();
+    $("#trail-detail-display > tbody").empty();
+    $("#dynamic-image-display").empty();
+}
 
 // To get latitute and longitude of current position
 var x = document.getElementById("currentLocation-btn");
 function getLocation() {
-    $("#name-trail").empty();
-    $("#location-trail").empty();
-    $("#summary-trail").empty();
+    clearFields();
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     } else {
@@ -38,16 +49,14 @@ function showPosition(position) {
     globalLatitude = position.coords.latitude;
     globalLongitude = position.coords.longitude;
     searchTrails();
-    // drawMap();
+    drawMap();
     drawMap2();
 }
 
 // MapBox Search Engine
 $("#add-place-btn").on("click", function (event) {
     event.preventDefault();
-    $("#name-trail").empty();
-    $("#location-trail").empty();
-    $("#summary-trail").empty();
+    clearFields();
     var profile = "mapbox.places";
     var search_text = $("#place-search-input").val().trim();
     var queryURL = "https://api.mapbox.com/geocoding/v5/" + profile + "/" + search_text + ".json?access_token=pk.eyJ1IjoiZWNoaWFuZyIsImEiOiJjanQ3bThubjYwdG5xNDRxenpibW9wNWNyIn0.kXtdrsT0cX6ueibMKnRDRQ";
@@ -82,8 +91,8 @@ $("#add-place-btn").on("click", function (event) {
 
         document.getElementById('place-search-input').value = '';
         searchTrails();
-        // drawMap();
-        // drawMap2();
+        drawMap();
+        drawMap2();
     });
 });
 
@@ -92,9 +101,13 @@ function searchTrails() {
     var HPapiKey = "200430235-4fcde47c0989de1903e61a50826e882f";
     var HPqueryURL = "https://www.hikingproject.com/data/get-trails?lat=" + globalLatitude + "&lon=" + globalLongitude + "&maxDistance=10&key=" + HPapiKey;
     console.log("Hiking Project query URL: " + HPqueryURL);
-    $("#HP-search-display > thead").empty();
-    $("#HP-search-display > tbody").empty();
-    $("#HP-image-display").empty();
+    // $("#HP-search-display > thead").empty();
+    // $("#HP-search-display > tbody").empty();
+    // $("#HP-image-display").empty();
+    // $("#modal-btn").empty();
+    clearFields();
+    // $("#HP-search-display tr").empty();
+    // $("#HP-search-display tr").remove();
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -103,6 +116,8 @@ function searchTrails() {
         console.log(response);
         var newSearchHead = "";
         var newSearchRow = "";
+
+        $("<tr>").remove();
 
         newSearchHead = $("<tr>").append(
             $("<th>").text("Select"),
@@ -138,6 +153,7 @@ function searchTrails() {
             $("#HP-search-display > tbody").append(newSearchRow);
 
             // Create div with image and name to append to HTML
+            
             var imageDiv = $("<div class='imageDiv'>");
 
             var imageTag = $("<img>")
@@ -149,27 +165,14 @@ function searchTrails() {
             var a = $("<a>").attr("href", "details.html");
             // imageTag.wrap(a);
             a.append(imageTag);
-
             imageDiv.append(a);
 
-            // -------- Method 2: This will dynamically generate "names" with links to details.html but will rewrite the entire page!
-            // imagetxt = response.trails[i].name;
-            // document.write("<p>" + imagetxt.link("details.html") + "</p>");
+            // var pName = $("<p>").text(response.trails[i].name);
+            // pName.addClass("imageName");
+            // pName.append('<a id="link" href="details.html">testing</a>');
+            // pName.wrap("<a href='details.html'> testing3</a>");
 
-            // -------- Method 3:This will dynamically generate images and names where I want them (sort of non-horizonal) but not linked to webpage!
-            // var para = document.createElement("p");
-            // var node = document.createTextNode(response.trails[i].name);
-            // para.appendChild(node);
-            // var element = document.getElementById("HP-image-display");
-            // element.appendChild(para);
-
-            // -------- Method 4: This will generate image with name at the bottom of image as well as hyperlink text, but can't combine name and hyperlink!
-            var pName = $("<p>").text(response.trails[i].name);
-            pName.addClass("imageName");
-            pName.append('<a id="link" href="details.html">testing</a>');
-            pName.wrap("<a href='details.html'> testing3</a>");
-
-            imageDiv.append(pName);
+            // imageDiv.append(pName);
 
 
             // var newInput = {
@@ -185,29 +188,42 @@ function searchTrails() {
             //   console.log("Firebase: " + searchLatitude);
 
 
-            var pCoordinates = $("<p>")
-            pCoordinates.addClass("HPCoordinates");
-            pCoordinates.text(response.trails[i].latitude); // strangely not displayed
-            pCoordinates.text(response.trails[i].longitude); // only this is displayed
-            // imageDiv.append(pCoordinates);
+            // var pCoordinates = $("<p>")
+            // pCoordinates.addClass("HPCoordinates");
+            // pCoordinates.text(response.trails[i].latitude); // strangely not displayed
+            // pCoordinates.text(response.trails[i].longitude); // only this is displayed
+            // // imageDiv.append(pCoordinates);
 
-            // Append the new row to the table
-            // $("#mapbox-search-display > tfoot").append(image);
-            $("#HP-image-display").append(a); // instead of imageTag (or imageDiv) and pName separately
-            // $("#HP-image-display").append(pName);
+            // // Append the new row to the table
+            // // $("#mapbox-search-display > tfoot").append(image);
+            // $("#HP-image-display").append(a); // instead of imageTag (or imageDiv) and pName separately
+            // // $("#HP-image-display").append(pName);
 
         };
-        // Select the checkbox to see more info.
-        $(document.body).on("click", ".checkbox", function () {
-            trailId = $(this).attr("data-to-select");
-            console.log(trailId);
-            // $("#HP-search-display > thead").empty();
-            // $("#HP-search-display > tbody").empty();
-            // $("#HP-image-display").empty();
-            selectTrail();
-        });
+        // // Select the checkbox to see more info.
+        // $(document.body).on("click", ".checkbox", function () {
+        //     trailId = $(this).attr("data-to-select");
+        //     // console.log(trailId);
+        //     // $("#HP-search-display > thead").empty();
+        //     // $("#HP-search-display > tbody").empty();
+        //     // $("#HP-image-display").empty();
+        //     selectTrail();
+        // });
     });
+    
 };
+
+// Select the checkbox to see more info.
+$(document.body).on("click", ".checkbox", function () {
+    trailId = $(this).attr("data-to-select");
+    // console.log(trailId);
+    // $("#HP-search-display > thead").empty();
+    // $("#HP-search-display > tbody").empty();
+    // $("#HP-image-display").empty();
+    selectTrail();
+});
+
+
 
 
 function selectTrail() {
@@ -217,6 +233,12 @@ function selectTrail() {
     $("#HP-search-display > thead").empty();
     $("#HP-search-display > tbody").empty();
     $("#HP-image-display").empty();
+    // $("#trail-detail-info").empty();
+    // $("#trail-detail-display > thead").empty();
+    // $("#trail-detail-display > tbody").empty();
+    
+    
+
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -230,20 +252,17 @@ function selectTrail() {
         $("#location-trail").text(response.trails[0].location);
         $("#summary-trail").text(response.trails[0].summary);
 
-        // var virtualBtn = $("<button>");
-        // trailId = response.trails[0].id;
-        // virtualBtn.attr("src", "https://www.hikingproject.com/earth/" + response.trails[0].id)
-        // virtualBtn.addClass("btn btn-primary"),
-        // virtualBtn.text("Virtual Tour");
-        // $("#modal-btn").append(virtualBtn);
-
-        // Modal for virtual tour button?
+        // Link for virtual tour button
         virtualTourBtn = $("<button>")
             .addClass("btn btn-primary")
             .attr("data-toggle", "modal")
-            .attr("src", "https://www.hikingproject.com/earth/" + response.trails[0].id + ", '_blank'")
             .text("Virtual Tour");
-        $("#modal-btn").append(virtualTourBtn);
+        
+        var atwo = $("<a target='_blank'>").attr("href", "https://www.hikingproject.com/earth/" + response.trails[0].id);
+
+        atwo.append(virtualTourBtn);
+        // virtualTourBtn.append(atwo);
+        $("#modal-btn").append(atwo);
 
         selectTrailHead = $("<tr>").append(
             $("<th>").text("Length"),
@@ -256,7 +275,7 @@ function selectTrail() {
         );
 
         // Append the new row to the table
-        $("#HP-search-display > thead").append(selectTrailHead);
+        $("#trail-detail-display > thead").append(selectTrailHead);
 
         var selectTrailRow = $("<tr>").append(
             $("<td>").text(response.trails[0].length + " mi"),
@@ -269,7 +288,7 @@ function selectTrail() {
         );
 
         // Append the new row to the table
-        $("#HP-search-display > tbody").append(selectTrailRow);
+        $("#trail-detail-display > tbody").append(selectTrailRow);
 
         // Create div with image and name to append to HTML
         var imageDiv = $("<div class='imageDiv'>");
@@ -330,6 +349,7 @@ function selectTrail() {
 
 
         drawMap();
+        drawMap2();
     });
 };
 
@@ -513,3 +533,4 @@ function drawMap2() {
 
 // ------- Details.html page begins here ---------------------------------------
 
+drawMap();
