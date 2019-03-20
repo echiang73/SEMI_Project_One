@@ -1,0 +1,62 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: lightblue;
+}
+#takeahike-logo {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    color: lightblue;
+}
+#container-all {
+    margin-top: 10px;
+}
+#currentLocation-btn{
+    position: relative;
+    left: 102px;
+    bottom: 54px;
+}
+
+#map {
+    position: absolute;
+    /* top: 20px; */
+    bottom: 0;
+    width: 100%;
+}
+
+/* Add animation style map */
+#menu {
+    position: absolute;
+    background: #fff;
+    /* padding: 10px; */
+    font-family: 'Open Sans', sans-serif;
+}
+.checkbox{
+    border-radius: 8px;
+}
+.image{
+    /* width: 200px; */
+    margin: 0 10px 10px 0;
+}
+#name-trail{
+    font-size: 28px;
+    color: blue;
+}
+#dynamic-image-display{
+    margin-top: 21px;
+}
+
+/* Display a popup on click - need to see how to add GeoJSON to populate info below*/
+/* .mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+} */
+
+/* #place-result-container{
+    margin-bottom: 285px;
+} */
+
+/* p{
+    color: white;
+} */
