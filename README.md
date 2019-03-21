@@ -14,9 +14,10 @@ https://echiang73.github.io/SEMI_Project_One/
 ## Built with
 * HTML5
 * CSS3
-* JavaScript
+* JavaScript with various dynamically created elements
 * Bootstrap
 * jQuery
+* API (from MapBox, Hiking Project, Here.com, and Open Weather)
 * Firebase
 * Moment.js
 * Responsive Web Design Media Query

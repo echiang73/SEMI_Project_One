@@ -1,31 +1,47 @@
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyDe0j4eOQrEq3lWl3W6zshW5eph48vNTuM",
-    authDomain: "take-a-hike-bb76f.firebaseapp.com",
-    databaseURL: "https://take-a-hike-bb76f.firebaseio.com",
-    projectId: "take-a-hike-bb76f",
-    storageBucket: "take-a-hike-bb76f.appspot.com",
-    messagingSenderId: "501940076031"
+    apiKey: "AIzaSyAT8nHuIDEOMChpRu6QTuTn4ALjJ8QQMNA",
+    authDomain: "hiking-project-78923.firebaseapp.com",
+    databaseURL: "https://hiking-project-78923.firebaseio.com",
+    projectId: "hiking-project-78923",
+    storageBucket: "hiking-project-78923.appspot.com",
+    messagingSenderId: "135848642912"
 };
 firebase.initializeApp(config);
 
 // https://api.mapbox.com/styles/v1/mapbox/outdoors-v9.html?title=true&access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA#16/32.309826/-110.8229
 
 var database = firebase.database();
-var globalLatitude = "";
-var globalLongitude = "";
-var searchLatitude = "";
-var searchLongitude = "";
+var globalLatitude = "32.222916"; // default lat for downtown Tucson, AZ
+var globalLongitude = "-110.972145"; // default lat for downtown Tucson, AZ
 var imagetxt = "";
 var trailId = "";
+var hereMapPar = "";
+var hereMap = "";
 
+// Clear dynamic fields
+function clearFields() {
+    $("#name-trail").empty();
+    $("#location-trail").empty();
+    $("#summary-trail").empty();
+    $("#HP-search-display > thead").empty();
+    $("#HP-search-display > tbody").empty();
+    $("#HP-image-display").empty();
+    $("#modal-btn").empty();
+    $("#driving-btn").empty();
+    $("#trail-detail-display > thead").empty();
+    $("#trail-detail-display > tbody").empty();
+    $("#dynamic-image-display").empty();
+    $("#mapContainer").empty();
+}
 
 // To get latitute and longitude of current position
 var x = document.getElementById("currentLocation-btn");
 function getLocation() {
-    $("#name-trail").empty();
-    $("#location-trail").empty();
-    $("#summary-trail").empty();
+    clearFields();
+    // $("#menu").hide();
+    // $("#m").hide();
+    // $("#mapContainer").hide();
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     } else {
@@ -37,17 +53,20 @@ function showPosition(position) {
     // Store coordinates to global variable
     globalLatitude = position.coords.latitude;
     globalLongitude = position.coords.longitude;
+    // Set global variables to firebase storage
+    database.ref().set({
+        globalLatitude: globalLatitude,
+        globalLongitude: globalLongitude
+    });
     searchTrails();
     // drawMap();
-    drawMap2();
+    drawMap10();
 }
 
-// MapBox Search Engine
+// MapBox Search Engine for places, address, point of interest and return coordinates
 $("#add-place-btn").on("click", function (event) {
     event.preventDefault();
-    $("#name-trail").empty();
-    $("#location-trail").empty();
-    $("#summary-trail").empty();
+    clearFields();
     var profile = "mapbox.places";
     var search_text = $("#place-search-input").val().trim();
     var queryURL = "https://api.mapbox.com/geocoding/v5/" + profile + "/" + search_text + ".json?access_token=pk.eyJ1IjoiZWNoaWFuZyIsImEiOiJjanQ3bThubjYwdG5xNDRxenpibW9wNWNyIn0.kXtdrsT0cX6ueibMKnRDRQ";
@@ -57,44 +76,33 @@ $("#add-place-btn").on("click", function (event) {
     $.ajax({
         url: queryURL, method: "GET"
     }).then(function (response) {
-        console.log(response);
+        console.log("MapBox search: " + response);
         var newSearchRowSet = "";
-
-        console.log("name: " + response.features[0].place_name);
-        console.log("lat: " + response.features[0].center[1]);
-        console.log("lng: " + response.features[0].center[0]);
-
-        // var newSearchRow = $("<tr>").append(
-        //     $("<td>").text(response.features[0].place_name),
-        //     $("<td>").text(response.features[0].center[1]),
-        //     $("<td>").text(response.features[0].center[0])
-        // );
-
-        // // Append the new row to the table
-        // $("#search-display > tbody").append(newSearchRow);
 
         // Temp use index=0 coordinates to map on MapBox
         globalLatitude = response.features[0].center[1];
         globalLongitude = response.features[0].center[0];
 
-        console.log(globalLatitude);
-        console.log(globalLongitude);
+        // Set global variables to firebase storage
+        database.ref().set({
+            globalLatitude: globalLatitude,
+            globalLongitude: globalLongitude
+        });
 
         document.getElementById('place-search-input').value = '';
         searchTrails();
         // drawMap();
-        // drawMap2();
+        drawMap10();
     });
 });
 
-//Perform search of trails on HikingProject.com
+//Perform search of 10 trails on HikingProject.com
 function searchTrails() {
     var HPapiKey = "200430235-4fcde47c0989de1903e61a50826e882f";
     var HPqueryURL = "https://www.hikingproject.com/data/get-trails?lat=" + globalLatitude + "&lon=" + globalLongitude + "&maxDistance=10&key=" + HPapiKey;
     console.log("Hiking Project query URL: " + HPqueryURL);
-    $("#HP-search-display > thead").empty();
-    $("#HP-search-display > tbody").empty();
-    $("#HP-image-display").empty();
+    clearFields();
+    // hereMapPar.append(hereMap); // reattach this dynamic element
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -138,38 +146,27 @@ function searchTrails() {
             $("#HP-search-display > tbody").append(newSearchRow);
 
             // Create div with image and name to append to HTML
+
             var imageDiv = $("<div class='imageDiv'>");
 
             var imageTag = $("<img>")
             imageTag.attr("src", response.trails[i].imgSqSmall);
             imageTag.width("200px");
             imageTag.addClass("image");
+            imageDiv.append(imageTag);
 
             // -------- Method 1: .wrap method to dynamically generate images and try to link, but doesn't work!
             var a = $("<a>").attr("href", "details.html");
-            // imageTag.wrap(a);
             a.append(imageTag);
-
             imageDiv.append(a);
 
-            // -------- Method 2: This will dynamically generate "names" with links to details.html but will rewrite the entire page!
-            // imagetxt = response.trails[i].name;
-            // document.write("<p>" + imagetxt.link("details.html") + "</p>");
-
-            // -------- Method 3:This will dynamically generate images and names where I want them (sort of non-horizonal) but not linked to webpage!
-            // var para = document.createElement("p");
-            // var node = document.createTextNode(response.trails[i].name);
-            // para.appendChild(node);
-            // var element = document.getElementById("HP-image-display");
-            // element.appendChild(para);
-
-            // -------- Method 4: This will generate image with name at the bottom of image as well as hyperlink text, but can't combine name and hyperlink!
             var pName = $("<p>").text(response.trails[i].name);
             pName.addClass("imageName");
-            pName.append('<a id="link" href="details.html">testing</a>');
-            pName.wrap("<a href='details.html'> testing3</a>");
-
+            // pName.append('<a id="link" href="details.html"></a>');
+            // pName.wrap("<a href='details.html'> testing3</a>");
             imageDiv.append(pName);
+
+
 
 
             // var newInput = {
@@ -185,30 +182,42 @@ function searchTrails() {
             //   console.log("Firebase: " + searchLatitude);
 
 
-            var pCoordinates = $("<p>")
-            pCoordinates.addClass("HPCoordinates");
-            pCoordinates.text(response.trails[i].latitude); // strangely not displayed
-            pCoordinates.text(response.trails[i].longitude); // only this is displayed
-            // imageDiv.append(pCoordinates);
+            // var pCoordinates = $("<p>")
+            // pCoordinates.addClass("HPCoordinates");
+            // pCoordinates.text(response.trails[i].latitude); // strangely not displayed
+            // pCoordinates.text(response.trails[i].longitude); // only this is displayed
+            // // imageDiv.append(pCoordinates);
 
-            // Append the new row to the table
-            // $("#mapbox-search-display > tfoot").append(image);
-            $("#HP-image-display").append(a); // instead of imageTag (or imageDiv) and pName separately
-            // $("#HP-image-display").append(pName);
+            // // Append the new row to the table
+            // // $("#mapbox-search-display > tfoot").append(image);
+            $("#HP-image-display").append(imageDiv); // instead of imageTag (or imageDiv) and pName separately
+            // // $("#HP-image-display").append(pName);
 
         };
-        // Select the checkbox to see more info.
-        $(document.body).on("click", ".checkbox", function () {
-            trailId = $(this).attr("data-to-select");
-            console.log(trailId);
-            // $("#HP-search-display > thead").empty();
-            // $("#HP-search-display > tbody").empty();
-            // $("#HP-image-display").empty();
-            selectTrail();
-        });
+        // // Select the checkbox to see more info.
+        // $(document.body).on("click", ".checkbox", function () {
+        //     trailId = $(this).attr("data-to-select");
+        //     // console.log(trailId);
+        //     // $("#HP-search-display > thead").empty();
+        //     // $("#HP-search-display > tbody").empty();
+        //     // $("#HP-image-display").empty();
+        //     selectTrail();
+        // });
     });
 };
 
+// Select the checkbox to see more info.
+$(document.body).on("click", ".checkbox", function () {
+    trailId = $(this).attr("data-to-select");
+
+    // Set global variables to firebase storage
+    database.ref().set({
+        trailId: trailId
+    });
+    // hereMapPar = $("#mapContainer");
+    // hereMap = $("#mapContainer").detach();
+    selectTrail();
+});
 
 function selectTrail() {
     var HPapiKey = "200430235-4fcde47c0989de1903e61a50826e882f";
@@ -217,6 +226,9 @@ function selectTrail() {
     $("#HP-search-display > thead").empty();
     $("#HP-search-display > tbody").empty();
     $("#HP-image-display").empty();
+    // $("#mapContainer").remove(); // .remove does the job once, but then disappears alltogether
+    // $("#mapContainer").empty()
+    $("#mapContainer").hide();
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -225,25 +237,35 @@ function selectTrail() {
         console.log(response);
         var selectTrailHead = "";
         var selectTrailRow = "";
+        globalLatitude = response.trails[0].latitude;
+        globalLongitude = response.trails[0].longitude;
 
         $("#name-trail").text(response.trails[0].name);
         $("#location-trail").text(response.trails[0].location);
         $("#summary-trail").text(response.trails[0].summary);
 
-        // var virtualBtn = $("<button>");
-        // trailId = response.trails[0].id;
-        // virtualBtn.attr("src", "https://www.hikingproject.com/earth/" + response.trails[0].id)
-        // virtualBtn.addClass("btn btn-primary"),
-        // virtualBtn.text("Virtual Tour");
-        // $("#modal-btn").append(virtualBtn);
-
-        // Modal for virtual tour button?
+        // Link for virtual tour button
         virtualTourBtn = $("<button>")
-            .addClass("btn btn-primary")
+            .addClass("btn btn-info")
             .attr("data-toggle", "modal")
-            .attr("src", "https://www.hikingproject.com/earth/" + response.trails[0].id + ", '_blank'")
             .text("Virtual Tour");
-        $("#modal-btn").append(virtualTourBtn);
+
+        var atwo = $("<a target='_blank'>").attr("href", "https://www.hikingproject.com/earth/" + response.trails[0].id);
+
+        atwo.append(virtualTourBtn);
+        // virtualTourBtn.append(atwo);
+        $("#modal-btn").append(atwo);
+
+        // Link for driving directions button
+        drivingBtn = $("<button>")
+            .addClass("btn btn-info")
+            .attr("data-toggle", "modal")
+            .text("Driving Directions");
+
+        var athree = $("<a target='_blank'>").attr("href", "https://www.google.com/maps/dir//" + globalLatitude + "," + globalLongitude);
+
+        athree.append(drivingBtn);
+        $("#driving-btn").append(athree);
 
         selectTrailHead = $("<tr>").append(
             $("<th>").text("Length"),
@@ -256,7 +278,7 @@ function selectTrail() {
         );
 
         // Append the new row to the table
-        $("#HP-search-display > thead").append(selectTrailHead);
+        $("#trail-detail-display > thead").append(selectTrailHead);
 
         var selectTrailRow = $("<tr>").append(
             $("<td>").text(response.trails[0].length + " mi"),
@@ -269,7 +291,7 @@ function selectTrail() {
         );
 
         // Append the new row to the table
-        $("#HP-search-display > tbody").append(selectTrailRow);
+        $("#trail-detail-display > tbody").append(selectTrailRow);
 
         // Create div with image and name to append to HTML
         var imageDiv = $("<div class='imageDiv'>");
@@ -304,43 +326,26 @@ function selectTrail() {
 
         imageDiv.append(pName);
 
-
-        // var newInput = {
-        //     searchLatitude: searchLatitude,
-        //     searchLongitude: searchLongitude
-        //   };
-
-        //   database.ref().set({
-        //     searchLatitude: searchLatitude
-        //   });
-
-        // //   database.ref().push(newInput);
-        //   console.log("Firebase: " + searchLatitude);
-
-
-        
         globalLatitude = response.trails[0].latitude;
         globalLongitude = response.trails[0].longitude;
-        
+
+        database.ref().set({
+            globalLatitude: globalLatitude,
+            globalLongitude: globalLongitude
+        });
 
         // Append the new row to the table
-        // $("#mapbox-search-display > tfoot").append(image);
-        $("#dynamic-image-display").append(imageTag); // instead of imageTag (or imageDiv) and pName separately
-        // $("#HP-image-display").append(pName);
-
+        $("#dynamic-image-display").append(imageTag);
 
         drawMap();
+        // drawMap10();
     });
 };
 
-
-
-
-
-
-// Script for Map Box
+// Script for Map Box 2D/3D maps
 function drawMap() {
-
+    $("#menu").show();
+    // $("#mapContainer").hide();
     mapboxgl.accessToken = 'pk.eyJ1IjoiZWNoaWFuZyIsImEiOiJjanQ3bThubjYwdG5xNDRxenpibW9wNWNyIn0.kXtdrsT0cX6ueibMKnRDRQ';
     var map = new mapboxgl.Map({
         container: 'map',
@@ -443,66 +448,78 @@ function drawMap() {
 //         "<br>Longitude: " + position.coords.longitude;
 // }
 
-function drawMap2() {
+function drawMap10() { // Here.com map with 10 markers
+    var HPapiKey = "200430235-4fcde47c0989de1903e61a50826e882f";
+    var HPqueryURL = "https://www.hikingproject.com/data/get-trails?lat=" + globalLatitude + "&lon=" + globalLongitude + "&maxDistance=10&key=" + HPapiKey;
+    console.log("Hiking Project query URL: " + HPqueryURL);
+    clearFields();
 
-    // Instantiate a map and platform object:
-    var platform = new H.service.Platform({
-        'app_id': 'lXHRffwX6TdjZ7BrjvWs',
-        'app_code': 'OCuZ0QBvJ75E8_v0Nh-QCA'
-    });
-    // Retrieve the target element for the map:
-    var targetElement = document.getElementById('mapContainer');
+    // Creating an AJAX call for the specific search button being clicked
+    $.ajax({
+        url: HPqueryURL, method: "GET"
+    }).then(function (response) {
+        console.log(response);
 
-    // Get default map types from the platform object:
-    var defaultLayers = platform.createDefaultLayers();
 
-    // Instantiate the map:
-
-    // Create the parameters for the geocoding request:
-    var geocodingParams = {
-        searchText: (globalLatitude, globalLongitude)
-    };
-
-    // Define a callback function to process the geocoding response:
-    // var onResult = function (result) {
-    //     var locations = result.Response.View[0].Result,
-    //         position,
-    //         marker;
-    //     console.log(result);
-    var searchLat = globalLatitude;
-    var searchLng = globalLongitude;
-
-    $("#mapContainer").empty();
-    var map = new H.Map(
-        document.getElementById('mapContainer'),
-        defaultLayers.normal.map,
-        {
-            zoom: 14,
-            center: { lat: globalLatitude, lng: globalLongitude }
+        // Instantiate a map and platform object:
+        var platform = new H.service.Platform({
+            'app_id': 'lXHRffwX6TdjZ7BrjvWs',
+            'app_code': 'OCuZ0QBvJ75E8_v0Nh-QCA'
         });
+        // Retrieve the target element for the map:
+        var targetElement = document.getElementById('mapContainer');
 
-    // Add a marker for each location found
+        // Get default map types from the platform object:
+        var defaultLayers = platform.createDefaultLayers();
 
-    position = {
-        // lat: locations[0].Location.DisplayPosition.Latitude,
-        // lng: locations[0].Location.DisplayPosition.Longitude
-        lat: globalLatitude,
-        lng: globalLongitude
-    };
-    marker = new H.map.Marker(position);
-    map.addObject(marker);
+        // Instantiate the map:
 
-    // };
+        // Create the parameters for the geocoding request:
+        var geocodingParams = {
+            searchText: (globalLatitude, globalLongitude)
+        };
 
-    // Get an instance of the geocoding service:
-    var geocoder = platform.getGeocodingService();
+        $("#mapContainer").empty();
+        var map = new H.Map(
+            document.getElementById('mapContainer'),
+            defaultLayers.normal.map,
+            {
+                zoom: 11,
+                center: { lat: globalLatitude, lng: globalLongitude }
+            });
 
+        // marker for current position based on global Lat/Lng
+        position = {
+            lat: globalLatitude,
+            lng: globalLongitude
+        };
+        marker = new H.map.Marker(position);
+        map.addObject(marker);
+        // };
+
+        // Get an instance of the geocoding service:
+        var geocoder = platform.getGeocodingService();
+
+        // Add a marker for each location found
+        for (var i = 0; i < response.trails.length; i++) {
+        position = {
+            lat: response.trails[i].latitude,
+            lng: response.trails[i].longitude
+        };
+        marker = new H.map.Marker(position);
+        map.addObject(marker);
+        // };
+
+        // Get an instance of the geocoding service:
+        var geocoder = platform.getGeocodingService();
+    }
     // Call the geocode method with the geocoding parameters,
     // the callback and an error callback function (called if a
     // communication error occurs):
-    // geocoder.geocode(geocodingParams, onResult, function (e) {
+    // geocoder.geocode(geocodingParams, drawMap10, function (e) {
     //     alert(e);
     // });
+});
 };
 
 // function to refresh display current time every second
@@ -513,3 +530,6 @@ function drawMap2() {
 
 // ------- Details.html page begins here ---------------------------------------
 
+// drawMap();
+$("#menu").hide();
+// $("#map").hide();
