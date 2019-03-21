@@ -17,6 +17,11 @@ body {
     left: 102px;
     bottom: 54px;
 }
+#mapContainer{ /* Here.com Map */
+    width: 1060px;
+    height: 450px;
+    margin-bottom: 20px;
+}
 
 #map {
     position: absolute;
@@ -29,15 +34,27 @@ body {
 #menu {
     position: absolute;
     background: #fff;
-    /* padding: 10px; */
+    padding-top: 15px;
+    padding-right: 5px;
     font-family: 'Open Sans', sans-serif;
+    margin-top: 10px;
 }
 .checkbox{
     border-radius: 8px;
 }
+.imageDiv{
+    width: 210px;
+    float: left;
+}
 .image{
     /* width: 200px; */
     margin: 0 10px 10px 0;
+}
+.imageName{
+    font-size: 12px;
+    text-align: center;
+    width: 200px;
+    margin-top: -5px;
 }
 #name-trail{
     font-size: 28px;
@@ -46,6 +63,16 @@ body {
 #dynamic-image-display{
     margin-top: 21px;
 }
+#modal-btn {
+    position: relative;
+    float: left;
+    margin-right: 10px;
+}
+/* #driving-btn {
+    position: relative;
+    float: left;
+    margin-top: 10px;
+} */
 
 /* Display a popup on click - need to see how to add GeoJSON to populate info below*/
 /* .mapboxgl-popup {
