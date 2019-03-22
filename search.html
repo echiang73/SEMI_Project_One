@@ -51,11 +51,12 @@
                 <button class="btn btn-primary" id="currentLocation-btn" onclick="getLocation()">Get current
                     location</button>
                 <!-- <div id="current-location"></div> -->
-                <div class="form-group">
+                <div class="form-group" id="trail-detail-info">
                     <div id="name-trail"></div>
                     <div id="location-trail"></div>
                     <div id="summary-trail"></div>
                     <div id="modal-btn"></div>
+                    <div id="driving-btn"></div>
                 </div>
                 <table class="table table-sm table-hover" id="HP-search-display">
                     <thead>
@@ -64,42 +65,70 @@
                         <!-- Results are appended here-->
                     </tbody>
                 </table>
+
+                <table class="table table-sm table-hover" id="trail-detail-display">
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <!-- Specific trail details are appended here-->
+                    </tbody>
+                </table>
+
+                <div id="mapContainer"></div>
+                <!-- insert Here.com map with 10 markers here -->
+
                 <br><br>
                 <label for="image-gallery"id="imageGallery">Image Gallery: </label>
                 <hr>
-                <div id=HP-image-display class="gallery">
+                <div id=HP-image-display class="gallery"
+
                     <!-- Result images are appended here -->
                 </div>
                 <br />
+                
+
+
+                <div class="card-body" id="place-search">
+                    <div class="row">
+                        <div class="col-8">
+                            <div id='map' style='width: 700px; height: 480px;'></div>
+                            <div id='menu'>
+                                <input id='basic' type='radio' name='rtoggle' value='basic'>
+                                <label for='basic'>basic</label>
+                                <input id='streets' type='radio' name='rtoggle' value='streets' checked='checked'>
+                                <label for='streets'>streets</label>
+                                <!-- <input id='bright' type='radio' name='rtoggle' value='bright'>
+                                <label for='bright'>bright</label>
+                                <input id='light' type='radio' name='rtoggle' value='light'>
+                                <label for='light'>light</label>
+                                <input id='dark' type='radio' name='rtoggle' value='dark'>
+                                <label for='dark'>dark</label> -->
+                                <input id='satellite' type='radio' name='rtoggle' value='satellite'>
+                                <label for='satellite'>satellite</label>
+                            </div>
+                            <!-- <p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><br> -->
+    
+                        </div>
+    
+                        <div class="col-4">
+                            <div id="dynamic-image-display">
+                                <!-- selected trail's dynamic image goes here -->
+                            </div>
+                        </div>
+    
+                    </div>
+                </div>
+
+
+
             </div>
         </div>
     </div>
     <br />
 
-    <!-- Modal -->
-    <div class="modal fade" id="virtualTourModal" tabindex="-1" role="dialog" aria-labelledby="virtualTourModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="virtualTourModalLabel">Virtual Tour</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="container">
         <div class="card" id="place-result-container">
-            <div class="card-body" id="place-search">
+            <!-- <div class="card-body" id="place-search">
                 <div class="row">
                     <div class="col-8">
                         <div id='map' style='width: 700px; height: 480px;'></div>
@@ -108,44 +137,27 @@
                             <label for='basic'>basic</label>
                             <input id='streets' type='radio' name='rtoggle' value='streets' checked='checked'>
                             <label for='streets'>streets</label>
-                            <!-- <input id='bright' type='radio' name='rtoggle' value='bright'>
-                            <label for='bright'>bright</label>
-                            <input id='light' type='radio' name='rtoggle' value='light'>
-                            <label for='light'>light</label>
-                            <input id='dark' type='radio' name='rtoggle' value='dark'>
-                            <label for='dark'>dark</label> -->
                             <input id='satellite' type='radio' name='rtoggle' value='satellite'>
                             <label for='satellite'>satellite</label>
                         </div>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p>
-                        <p>.</p><br>
+                        <p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><p>.</p><br>
 
                     </div>
 
                     <div class="col-4">
                         <div id="dynamic-image-display">
-                            <!-- selected trail's dynamic image goes here -->
+                           
                         </div>
                     </div>
 
                 </div>
-            </div>
+            </div> -->
 
         </div>
     </div>
     <br />
 
-    <div class="container">
+    <!-- <div class="container">
         <div class="card" id="results-container">
             <h6 class="card-header" id="results-display">Results</h6>
             <div class="card-body">
@@ -155,16 +167,16 @@
                             <thead>
                             </thead>
                             <tbody>
-                                <!-- Results are appended here-->
+                                
                             </tbody>
                         </table><br>
-                        <div style="width: 640px; height: 480px" id="mapContainer"></div>
+                    
                         <br>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script src="https://www.gstatic.com/firebasejs/5.9.0/firebase.js"></script>
     <script type="text/javascript" src="assets/javascript/logic.js"></script>
