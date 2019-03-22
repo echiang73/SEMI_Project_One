@@ -412,7 +412,8 @@ function drawMap10() { // Here.com map with 10 markers
         // Instantiate a map and platform object:
         var platform = new H.service.Platform({
             'app_id': 'lXHRffwX6TdjZ7BrjvWs',
-            'app_code': 'OCuZ0QBvJ75E8_v0Nh-QCA'
+            'app_code': 'OCuZ0QBvJ75E8_v0Nh-QCA',
+            'useHTTPS': true
         });
         // Retrieve the target element for the map:
         var targetElement = document.getElementById('mapContainer');
