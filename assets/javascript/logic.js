@@ -28,6 +28,7 @@ function clearFields() {
     $("#summary-trail").empty();
     $("#HP-search-display > thead").empty();
     $("#HP-search-display > tbody").empty();
+    $("#gallery-head").empty();
     $("#HP-image-display").empty();
     $("#modal-btn").empty();
     $("#driving-btn").empty();
@@ -37,13 +38,19 @@ function clearFields() {
     $("#mapContainer").empty();
 }
 
+// Hide dynamic elements
+function hideElements() {
+    $("#menu").hide();
+    $("#map").hide();
+    $("#gallery-head").hide();
+    $("#condition-trail").hide();
+}
+
 // To get latitute and longitude of current position
 var x = document.getElementById("currentLocation-btn");
 function getLocation() {
     clearFields();
-    $("#menu").hide();
-    $("#map").hide();
-    // $("#mapContainer").hide();
+    hideElements();
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     } else {
@@ -69,8 +76,7 @@ function showPosition(position) {
 $("#add-place-btn").on("click", function (event) {
     event.preventDefault();
     clearFields();
-    $("#menu").hide();
-    $("#map").hide();
+    hideElements();
     var profile = "mapbox.places";
     var search_text = $("#place-search-input").val().trim();
     var queryURL = "https://api.mapbox.com/geocoding/v5/" + profile + "/" + search_text + ".json?access_token=pk.eyJ1IjoiZWNoaWFuZyIsImEiOiJjanQ3bThubjYwdG5xNDRxenpibW9wNWNyIn0.kXtdrsT0cX6ueibMKnRDRQ";
@@ -80,7 +86,7 @@ $("#add-place-btn").on("click", function (event) {
     $.ajax({
         url: queryURL, method: "GET"
     }).then(function (response) {
-        console.log("MapBox search: " + response);
+        console.log(response.features[0].place_name);
         var newSearchRowSet = "";
 
         // Temp use index=0 coordinates to map on MapBox
@@ -105,6 +111,7 @@ function searchTrails() {
     var HPqueryURL = "https://www.hikingproject.com/data/get-trails?lat=" + globalLatitude + "&lon=" + globalLongitude + "&maxDistance=10&key=" + HPapiKey;
     console.log("Hiking Project query URL: " + HPqueryURL);
     clearFields();
+    $("#gallery-head").show();
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -126,6 +133,9 @@ function searchTrails() {
 
         // Append the new row to the table
         $("#HP-search-display > thead").append(newSearchHead);
+
+        var imageHeader = $("<p>").text("Image Gallery:").add("<hr/>");
+            $("#gallery-head").append(imageHeader);
 
         for (var i = 0; i < response.trails.length; i++) {
             var newSearchRow = $("<tr>").append(
@@ -154,11 +164,12 @@ function searchTrails() {
             imageTag.attr("src", response.trails[i].imgSqSmall);
             imageTag.width("200px");
             imageTag.addClass("image");
+            imageTag.attr("data-to-select", trailId);
             imageDiv.append(imageTag);
 
-            var a = $("<a>").attr("href", "details.html");
-            a.append(imageTag);
-            imageDiv.append(a);
+            // var a = $("<a>").attr("href", "details.html");
+            // a.append(imageTag);
+            // imageDiv.append(a);
 
             var pName = $("<p>").text(response.trails[i].name);
             pName.addClass("imageName");
@@ -180,16 +191,28 @@ $(document.body).on("click", ".checkbox", function () {
     selectTrail();
 });
 
+// Select the image to see more information
+$(document.body).on("click", ".image", function () {
+    trailId = $(this).attr("data-to-select");
+
+    // Set global variables to firebase storage
+    database.ref().set({
+        trailId: trailId
+    });
+    selectTrail();
+});
+
+
 function selectTrail() {
     var HPapiKey = "200430235-4fcde47c0989de1903e61a50826e882f";
     var HPqueryURL = "https://www.hikingproject.com/data/get-trails-by-id?ids=" + trailId + "&key=" + HPapiKey;
     console.log("Hiking Project query URL: " + HPqueryURL);
     $("#HP-search-display > thead").empty();
     $("#HP-search-display > tbody").empty();
-    $("#HP-image-display").empty();
-    // $("#mapContainer").remove(); // .remove does the job once, but then disappears alltogether
-    // $("#mapContainer").empty()
+    $("#HP-image-display").empty()
     $("#mapContainer").hide();
+    $("#gallery-head").hide();
+    $("#condition-trail").show();
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -203,7 +226,8 @@ function selectTrail() {
 
         $("#name-trail").text(response.trails[0].name);
         $("#location-trail").text(response.trails[0].location);
-        $("#summary-trail").text(response.trails[0].summary);
+        $("#summary-trail").text('"' + response.trails[0].summary + '"');
+        $("#condition-trail").text('Condition: "' + response.trails[0].conditionDetails + '"');
 
         // Link for virtual tour button
         virtualTourBtn = $("<button>")
@@ -375,8 +399,9 @@ function drawMap() {
 function drawMap10() { // Here.com map with 10 markers
     var HPapiKey = "200430235-4fcde47c0989de1903e61a50826e882f";
     var HPqueryURL = "https://www.hikingproject.com/data/get-trails?lat=" + globalLatitude + "&lon=" + globalLongitude + "&maxDistance=10&key=" + HPapiKey;
-    console.log("Hiking Project query URL: " + HPqueryURL);
+    // console.log("Hiking Project query URL: " + HPqueryURL);
     clearFields();
+    $("#mapContainer").show();
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -414,7 +439,8 @@ function drawMap10() { // Here.com map with 10 markers
             lat: globalLatitude,
             lng: globalLongitude
         };
-        marker = new H.map.Marker(position);
+
+        marker = new H.map.Marker(position)
         map.addObject(marker);
         // };
 
@@ -449,3 +475,5 @@ function drawMap10() { // Here.com map with 10 markers
 // }, 1000 * 1);
 
 $("#menu").hide();
+$("#mapContainer").hide();
+$("#map").hide();
