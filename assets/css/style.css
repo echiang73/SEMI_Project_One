@@ -1,17 +1,23 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: lightblue;
+    
+
 }
 #takeahike-logo {
     text-align: center;
-    font-weight: bold;
-    font-size: 24px;
-    color: lightblue;
+    font-family: 'Amatic SC', cursive;
+    font-size: 40px;
+    color: mediumaquamarine;
 }
 #container-all {
     margin-top: 10px;
 }
+
+#place-search-container {
+    box-shadow: 10px 10px 5px grey;
+}
+
 #currentLocation-btn{
     position: relative;
     left: 102px;
@@ -33,14 +39,21 @@ body {
 /* Add animation style map */
 #menu {
     position: absolute;
+
     background: #fff;
-    padding-top: 15px;
-    padding-right: 5px;
+
     font-family: 'Open Sans', sans-serif;
     margin-top: 10px;
 }
 .checkbox{
     border-radius: 8px;
+    background-color: mediumaquamarine;
+}
+
+#imageGallery {
+    font-family: 'Amatic SC', cursive;
+    font-size: 30px;
+    text-decoration: underline;
 }
 .imageDiv{
     width: 210px;
@@ -49,19 +62,31 @@ body {
 .image{
     /* width: 200px; */
     margin: 0 10px 10px 0;
+    border-radius: 50%;
+    border: solid yellow 3px;
+    box-shadow: 10px 10px 5px grey;
 }
-.imageName{
-    font-size: 12px;
-    text-align: center;
-    width: 200px;
-    margin-top: -5px;
-}
+
 #name-trail{
     font-size: 28px;
     color: blue;
 }
+
+#place-result-container {
+    box-shadow: 10px 10px 5px grey;
+}
 #dynamic-image-display{
     margin-top: 21px;
+    
+}
+
+#results-container {
+    box-shadow: 10px 10px 5px grey;
+}
+
+#results-display {
+    background-color: mediumaquamarine;
+    border: solid black 1px;
 }
 #modal-btn {
     position: relative;
