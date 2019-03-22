@@ -1,6 +1,6 @@
-# Get a Hike
+# Take a Hike
 
-Looking for a hiking trail in your area? This app will allow you to search for nearby trails with detailed information and maps about local trails.
+Looking for a hiking trail in your area? This app will allow you to search for nearby trails with detailed information and maps about local trails.  This is our first group project. 
 
 ## App Interface
 Instructions:
@@ -18,10 +18,11 @@ https://echiang73.github.io/SEMI_Project_One/
 * Bootstrap
 * jQuery
 * API (from MapBox, Hiking Project, Here.com, and Open Weather)
+* CSS-Materialize
 * Firebase
 * Moment.js
 * Responsive Web Design Media Query
-* Font Awesome and @font-face
+* Google Fonts
 
 ### Here are the previews of the web application:
 
