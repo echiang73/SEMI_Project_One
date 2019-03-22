@@ -9,7 +9,7 @@ var config = {
 };
 firebase.initializeApp(config);
 
-// https://api.mapbox.com/styles/v1/mapbox/outdoors-v9.html?title=true&access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA#16/32.309826/-110.8229
+// Global Variables ---------------------------------------------------------------------------------------------------
 
 var database = firebase.database();
 var globalLatitude = "32.222916"; // default lat for downtown Tucson, AZ
@@ -18,6 +18,8 @@ var imagetxt = "";
 var trailId = "";
 var hereMapPar = "";
 var hereMap = "";
+
+// Functions -----------------------------------------------------------------------------------------------------------
 
 // Clear dynamic fields
 function clearFields() {
@@ -39,8 +41,8 @@ function clearFields() {
 var x = document.getElementById("currentLocation-btn");
 function getLocation() {
     clearFields();
-    // $("#menu").hide();
-    // $("#m").hide();
+    $("#menu").hide();
+    $("#map").hide();
     // $("#mapContainer").hide();
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
@@ -67,6 +69,8 @@ function showPosition(position) {
 $("#add-place-btn").on("click", function (event) {
     event.preventDefault();
     clearFields();
+    $("#menu").hide();
+    $("#map").hide();
     var profile = "mapbox.places";
     var search_text = $("#place-search-input").val().trim();
     var queryURL = "https://api.mapbox.com/geocoding/v5/" + profile + "/" + search_text + ".json?access_token=pk.eyJ1IjoiZWNoaWFuZyIsImEiOiJjanQ3bThubjYwdG5xNDRxenpibW9wNWNyIn0.kXtdrsT0cX6ueibMKnRDRQ";
@@ -91,7 +95,6 @@ $("#add-place-btn").on("click", function (event) {
 
         document.getElementById('place-search-input').value = '';
         searchTrails();
-        // drawMap();
         drawMap10();
     });
 });
@@ -102,7 +105,6 @@ function searchTrails() {
     var HPqueryURL = "https://www.hikingproject.com/data/get-trails?lat=" + globalLatitude + "&lon=" + globalLongitude + "&maxDistance=10&key=" + HPapiKey;
     console.log("Hiking Project query URL: " + HPqueryURL);
     clearFields();
-    // hereMapPar.append(hereMap); // reattach this dynamic element
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -146,7 +148,6 @@ function searchTrails() {
             $("#HP-search-display > tbody").append(newSearchRow);
 
             // Create div with image and name to append to HTML
-
             var imageDiv = $("<div class='imageDiv'>");
 
             var imageTag = $("<img>")
@@ -155,58 +156,20 @@ function searchTrails() {
             imageTag.addClass("image");
             imageDiv.append(imageTag);
 
-            // -------- Method 1: .wrap method to dynamically generate images and try to link, but doesn't work!
             var a = $("<a>").attr("href", "details.html");
             a.append(imageTag);
             imageDiv.append(a);
 
             var pName = $("<p>").text(response.trails[i].name);
             pName.addClass("imageName");
-            // pName.append('<a id="link" href="details.html"></a>');
-            // pName.wrap("<a href='details.html'> testing3</a>");
+
             imageDiv.append(pName);
-
-
-
-
-            // var newInput = {
-            //     searchLatitude: searchLatitude,
-            //     searchLongitude: searchLongitude
-            //   };
-
-            //   database.ref().set({
-            //     searchLatitude: searchLatitude
-            //   });
-
-            // //   database.ref().push(newInput);
-            //   console.log("Firebase: " + searchLatitude);
-
-
-            // var pCoordinates = $("<p>")
-            // pCoordinates.addClass("HPCoordinates");
-            // pCoordinates.text(response.trails[i].latitude); // strangely not displayed
-            // pCoordinates.text(response.trails[i].longitude); // only this is displayed
-            // // imageDiv.append(pCoordinates);
-
-            // // Append the new row to the table
-            // // $("#mapbox-search-display > tfoot").append(image);
-            $("#HP-image-display").append(imageDiv); // instead of imageTag (or imageDiv) and pName separately
-            // // $("#HP-image-display").append(pName);
-
+            $("#HP-image-display").append(imageDiv);
         };
-        // // Select the checkbox to see more info.
-        // $(document.body).on("click", ".checkbox", function () {
-        //     trailId = $(this).attr("data-to-select");
-        //     // console.log(trailId);
-        //     // $("#HP-search-display > thead").empty();
-        //     // $("#HP-search-display > tbody").empty();
-        //     // $("#HP-image-display").empty();
-        //     selectTrail();
-        // });
     });
 };
 
-// Select the checkbox to see more info.
+// Select the checkbox to see more information
 $(document.body).on("click", ".checkbox", function () {
     trailId = $(this).attr("data-to-select");
 
@@ -214,8 +177,6 @@ $(document.body).on("click", ".checkbox", function () {
     database.ref().set({
         trailId: trailId
     });
-    // hereMapPar = $("#mapContainer");
-    // hereMap = $("#mapContainer").detach();
     selectTrail();
 });
 
@@ -300,30 +261,10 @@ function selectTrail() {
         imageTag.attr("src", response.trails[0].imgMedium);
         imageTag.width("350px");
         imageTag.addClass("image");
-
-        // -------- Method 1: .wrap method to dynamically generate images and try to link, but doesn't work!
-        // var a = $("<a>").attr("href", "details.html");
-        // imageTag.wrap(a);
-
         imageDiv.append(imageTag);
 
-        // -------- Method 2: This will dynamically generate "names" with links to details.html but will rewrite the entire page!
-        // imagetxt = response.trails[i].name;
-        // document.write("<p>" + imagetxt.link("details.html") + "</p>");
-
-        // -------- Method 3:This will dynamically generate images and names where I want them (sort of non-horizonal) but not linked to webpage!
-        // var para = document.createElement("p");
-        // var node = document.createTextNode(response.trails[i].name);
-        // para.appendChild(node);
-        // var element = document.getElementById("HP-image-display");
-        // element.appendChild(para);
-
-        // -------- Method 4: This will generate image with name at the bottom of image as well as hyperlink text, but can't combine name and hyperlink!
         var pName = $("<p>").text(response.trails[0].name);
         pName.addClass("imageName");
-        pName.append('<a id="link" href="details.html">testing</a>');
-        pName.wrap("<a href='details.html'> testing3</a>");
-
         imageDiv.append(pName);
 
         globalLatitude = response.trails[0].latitude;
@@ -338,14 +279,13 @@ function selectTrail() {
         $("#dynamic-image-display").append(imageTag);
 
         drawMap();
-        // drawMap10();
     });
 };
 
 // Script for Map Box 2D/3D maps
 function drawMap() {
     $("#menu").show();
-    // $("#mapContainer").hide();
+    $("#map").show();
     mapboxgl.accessToken = 'pk.eyJ1IjoiZWNoaWFuZyIsImEiOiJjanQ3bThubjYwdG5xNDRxenpibW9wNWNyIn0.kXtdrsT0cX6ueibMKnRDRQ';
     var map = new mapboxgl.Map({
         container: 'map',
@@ -370,7 +310,6 @@ function drawMap() {
     }
 
     // To add 3D buildings
-
     mapboxgl.accessToken = 'pk.eyJ1IjoiZWNoaWFuZyIsImEiOiJjanQ3bThubjYwdG5xNDRxenpibW9wNWNyIn0.kXtdrsT0cX6ueibMKnRDRQ';
     var map = new mapboxgl.Map({
         style: 'mapbox://styles/mapbox/light-v9',
@@ -428,25 +367,10 @@ function drawMap() {
         }, labelLayerId);
     });
 }
+
 // Add a GeoJSON line
 
 
-
-// To get lat/lng of current position
-
-// var x = document.getElementById("current-location");
-// function getLocation() {
-//     if (navigator.geolocation) {
-//         navigator.geolocation.getCurrentPosition(showPosition);
-//     } else {
-//         x.innerHTML = "Geolocation is not supported by this browser.";
-//     }
-// }
-
-// function showPosition(position) {
-//     x.innerHTML = "Latitude: " + position.coords.latitude +
-//         "<br>Longitude: " + position.coords.longitude;
-// }
 
 function drawMap10() { // Here.com map with 10 markers
     var HPapiKey = "200430235-4fcde47c0989de1903e61a50826e882f";
@@ -460,7 +384,6 @@ function drawMap10() { // Here.com map with 10 markers
     }).then(function (response) {
         console.log(response);
 
-
         // Instantiate a map and platform object:
         var platform = new H.service.Platform({
             'app_id': 'lXHRffwX6TdjZ7BrjvWs',
@@ -471,8 +394,6 @@ function drawMap10() { // Here.com map with 10 markers
 
         // Get default map types from the platform object:
         var defaultLayers = platform.createDefaultLayers();
-
-        // Instantiate the map:
 
         // Create the parameters for the geocoding request:
         var geocodingParams = {
@@ -527,9 +448,4 @@ function drawMap10() { // Here.com map with 10 markers
 //     $("#current-time").text("Current date and time: " + moment().format("dddd, MMMM Do YYYY, hh:mm:ss A"));
 // }, 1000 * 1);
 
-
-// ------- Details.html page begins here ---------------------------------------
-
-// drawMap();
 $("#menu").hide();
-// $("#map").hide();

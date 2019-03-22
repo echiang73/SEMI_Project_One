@@ -14,6 +14,8 @@ body {
   font-size: 17px;
   background-color: black;
   color: lightblue;
+}
+h1{
   padding-left: 10px;
 }
 
@@ -37,6 +39,26 @@ body {
   margin-right: auto;
   text-align: center;
   border-radius: 10px;
+}
+
+.content-logo {
+  position: relative;
+  top: 500px;
+  /* background: rgba(0, 0, 0, 0.25); */
+  color: lightblue;
+  width: 100%;
+  padding-left: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  /* border-radius: 10px; */
+}
+
+#logos1 {
+  height: 60px;
+}
+#logos2 {
+  height: 80px;
 }
 
 #myBtn {
@@ -67,6 +89,14 @@ body {
 <div class="content">
   <h2>Find a hiking trail</h2>
   <button id="myBtn" onclick="window.location.href='search.html'">Click to GO!</button>
+</div>
+
+<div class="content-logo logos">
+  <h2>APIs powered by: </h2>
+  <img src="assets/images/logos/HikingProject.png" alt="Hiking Project API" id="logos1">
+  <img src="assets/images/logos/MapBox.png" alt="MapBox API" id="logos1">
+  <img src="assets/images/logos/Here.png" alt="Here.com API" id="logos2">
+  <img src="assets/images/logos/OpenWeatherMap.png" alt="Open Weather Map API" id="logos2">
 </div>
 
 <script>
