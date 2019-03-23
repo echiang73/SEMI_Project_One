@@ -113,3 +113,9 @@ a{
     float: left;
     margin-right: 10px;
 }
+#weather-detail-display {
+    /* line-height: 8px; */
+}
+.weatherIcon {
+    height: 24px;
+}

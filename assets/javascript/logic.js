@@ -44,6 +44,7 @@ function hideElements() {
     $("#map").hide();
     $("#gallery-head").hide();
     $("#condition-trail").hide();
+    $("#weather-detail-display").hide();
 }
 
 // To get latitute and longitude of current position
@@ -213,6 +214,7 @@ function selectTrail() {
     $("#mapContainer").hide();
     $("#gallery-head").hide();
     $("#condition-trail").show();
+    $("#weather-detail-display").show();
 
     // Creating an AJAX call for the specific search button being clicked
     $.ajax({
@@ -302,6 +304,7 @@ function selectTrail() {
         // Append the new row to the table
         $("#dynamic-image-display").append(imageTag);
 
+        getForecast();
         drawMap();
     });
 };
@@ -469,6 +472,49 @@ function drawMap10() { // Here.com map with 10 markers
     // });
 });
 };
+
+
+function getForecast() {
+    var OWMapiKey = "166a433c57516f51dfab1f7edaed8413";
+    var OWMqueryURL = "https://api.openweathermap.org/data/2.5/forecast?lat=" + globalLatitude + "&lon=" + globalLongitude + "&units=imperial&appid=" + OWMapiKey;
+    console.log("OpenWeatherMap query URL: " + OWMqueryURL);
+    $("#weather-detail-display > thead").empty();
+    $("#weather-detail-display > tbody").empty();
+
+    // Creating an AJAX call
+    $.ajax({
+        url: OWMqueryURL, method: "GET"
+    }).then(function (response) {
+        console.log(response);
+        var forecastHead = "";
+        var forecastRow = "";
+
+        forecastHead = $("<tr>").append(
+            $("<th>").text("Weather Forecast: "),
+            $("<th>").text("Conditions"),
+            $("<th>").text("Temperature"),
+            $("<th>").text("Wind Speed"),
+            $("<th>").text("Humidity"),
+        );
+
+        // Append the new row to the table
+        $("#weather-detail-display > thead").append(forecastHead);
+
+        for (var i = 0; i < 5; i++) {
+            var forecastRow = $("<tr>").append(
+                $("<td>").text("Day " + [i + 1]),
+                $("<td>").text(response.list[i * 8].weather[0].description).append($("<img>").attr("src", "http://openweathermap.org/img/w/" + response.list[i].weather[0].icon + ".png").addClass("weatherIcon")),
+                $("<td>").text(Math.floor(response.list[i * 8].main.temp) + " (F)"),
+                $("<td>").text(response.list[i * 8].wind.speed + " mph"),
+                $("<td>").text(response.list[i * 8].main.humidity + "%")
+            );
+            // Append the new row to the table
+            $("#weather-detail-display > tbody").append(forecastRow);
+        };
+
+    });
+};
+
 
 // function to refresh display current time every second
 // var windowTimeout = setInterval(function () {
